@@ -8,5 +8,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] public int Attack;
     [SerializeField] public string Name;
     public int currentHP;
+    [SerializeField] public GameObject deathEffect;
+    [SerializeField] public GameObject drop;
 
 }

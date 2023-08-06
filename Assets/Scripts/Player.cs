@@ -38,10 +38,15 @@ public class Player : MonoBehaviour
     [SerializeField] public TMP_Text enemyfightText;
     [SerializeField] public TMP_Text playerfightNameText;
     [SerializeField] public TMP_Text enemyfightNameText;
+    [SerializeField] public TMP_Text keysText;
 
     [SerializeField] GameObject fightPanel;
 
     private Enemy currentEnemy;
+
+    private int playerHit;
+
+    public int keyNumber;
 
 
 
@@ -52,6 +57,9 @@ public class Player : MonoBehaviour
     {
         character = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        playerMainNameText.text = playerName;
+        playerCurrentHP = playerHP;
+        playermainHPText.text = playerHP.ToString();
     }
 
     
@@ -79,7 +87,7 @@ public class Player : MonoBehaviour
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
 
-                if (Physics.Raycast(ray, out hit, 500))
+                if (Physics.Raycast(ray, out hit, 100))
                 {
                     character.SetDestination(hit.point);
 
@@ -102,6 +110,8 @@ public class Player : MonoBehaviour
             animator.SetInteger("Walk", 1);
             
         }
+
+        keysText.text = keyNumber.ToString();
 
         }
 
@@ -128,18 +138,26 @@ public class Player : MonoBehaviour
 
     public void Fight()
     {
+        animator.Play("atack shield");
+
+        var enemyanim = currentEnemy.GetComponent<Animator>();
+
+        enemyanim.Play("Attack");
+
         int enemyHit = Random.Range(0, 5);
         int enemyBlock = Random.Range(0, 5);
         int enemyDamage = Random.Range(0, currentEnemy.Attack+1);
         int playerDamage = Random.Range(0, playerAttack+1);
         bool isBlocked=false;
+        var toggles = defendTogglesGroup.GetComponentsInChildren<Toggle>();
+
         if (Random.Range(0,100)<10)
         {
-            enemyfightText.text = playerName + " увернулся от удара " + currentEnemy.Name + " в " + zones[enemyHit];
+            enemyfightText.text = playerName + " <color=green>увернулся</color> от удара " + currentEnemy.Name + " в " + zones[enemyHit];
         }
         else
         {
-            var toggles = defendTogglesGroup.GetComponentsInChildren<Toggle>();
+            
 
             for(int i=0; i<5; i++)
             {
@@ -148,13 +166,13 @@ public class Player : MonoBehaviour
                     isBlocked = true;
                     if(Random.Range(0, 100) < 10)
                     {
-                        enemyfightText.text = currentEnemy.Name+" пробил блок и нанес "+ playerName + " " + enemyDamage.ToString()+" урона в " + zones[enemyHit];
+                        enemyfightText.text = currentEnemy.Name+ " <color=blue>пробил блок</color> и нанес " + playerName + " " + enemyDamage.ToString()+" урона в " + zones[enemyHit];
                         playerCurrentHP -= enemyDamage;
                         if (playerCurrentHP < 0) playerCurrentHP = 0;
                     }
                     else
                     {
-                        enemyfightText.text = playerName + " заблокировал удар " + currentEnemy.Name + " в " + zones[enemyHit];
+                        enemyfightText.text = playerName + " <color=#a52a2aff>заблокировал</color> удар " + currentEnemy.Name + " в " + zones[enemyHit];
                     }
                 }
             }
@@ -167,49 +185,61 @@ public class Player : MonoBehaviour
 
             }
         isBlocked = false;
+        
 
-        if (Random.Range(0, 100) < 10)
+        toggles = attackTogglesGroup.GetComponentsInChildren<Toggle>();
+
+        for (int i = 0; i < 5; i++)
+        { if (toggles[i].isOn) playerHit = i; }
+
+            if (Random.Range(0, 100) < 10)
         {
-            playerfightText.text = currentEnemy.Name + " увернулся от удара " +playerName  + " в " + zones[enemyHit];
+            playerfightText.text = currentEnemy.Name + " <color=green>увернулся</color> от удара " + playerName+ " в "+ zones[playerHit];
         }
         else
         {
-            var toggles = attackTogglesGroup.GetComponentsInChildren<Toggle>();
+            
 
-            for (int i = 0; i < 5; i++)
-            {
-                if (toggles[i].isOn && enemyBlock == i)
+            
+                if (playerHit==enemyBlock)
                 {
                     isBlocked = true;
                     if (Random.Range(0, 100) < 10)
                     {
-                        playerfightText.text = playerName + " пробил блок и нанес " +  currentEnemy.Name+ " " + playerDamage.ToString() + " урона в " + zones[enemyHit];
+                        playerfightText.text = playerName + " <color=blue>пробил блок</color> и нанес " +  currentEnemy.Name+ " " + playerDamage.ToString() + " урона в " + zones[playerHit];
                         currentEnemy.currentHP -= playerDamage;
                         if (currentEnemy.currentHP < 0) currentEnemy.currentHP = 0;
                     }
                     else
                     {
-                        playerfightText.text = currentEnemy.Name + " заблокировал удар " + playerName + " в " + zones[enemyHit];
+                        playerfightText.text = currentEnemy.Name + " <color=#a52a2aff>заблокировал</color> удар " + playerName + " в " + zones[playerHit];
                     }
                 }
             }
             if (!isBlocked)
             {
-                playerfightText.text = playerName + " нанес " + currentEnemy.Name + " " + playerDamage.ToString() + " урона в " + zones[enemyHit];
+                playerfightText.text = playerName + " нанес " + currentEnemy.Name + " " + playerDamage.ToString() + " урона в " + zones[playerHit];
                 currentEnemy.currentHP -= playerDamage;
                 if (currentEnemy.currentHP < 0) currentEnemy.currentHP = 0;
             }
-        }
+        
 
-        playermainHPBar.fillAmount = playerCurrentHP / playerHP;
-        playerfightHPBar.fillAmount = playerCurrentHP / playerHP;
-        enemyfightHPBar.fillAmount = currentEnemy.currentHP / currentEnemy.HP;
+        playermainHPBar.fillAmount = (float)playerCurrentHP / (float)playerHP;
+        playerfightHPBar.fillAmount = (float)playerCurrentHP / (float)playerHP;
+        enemyfightHPBar.fillAmount = (float)currentEnemy.currentHP / (float)currentEnemy.HP;
+        playermainHPText.text = playerCurrentHP.ToString();
+        playerfightHPText.text = playerCurrentHP.ToString();
+        enemyfightHPText.text = currentEnemy.currentHP.ToString();
+
 
         if (currentEnemy.currentHP==0)
         {
             fightPanel.SetActive(false);
-            Destroy(currentEnemy);
+            Instantiate(currentEnemy.deathEffect, currentEnemy.transform.position,Quaternion.identity);
+            Instantiate(currentEnemy.drop, currentEnemy.transform.position,Quaternion.identity);
+            Destroy(currentEnemy.gameObject);
             inFight = false;
+            animator.Play("idle1");
 
         }
 
