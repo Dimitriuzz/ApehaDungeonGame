@@ -21,7 +21,7 @@ public class Gate : MonoBehaviour
             animation.enabled = true;
         }
         else
-            message.text = "Вам нужно " + needKeys.ToString() + " ключей чтобы открыть эту дверь";
+            message.text = "Вам нужно " + needKeys.ToString() + " ключа чтобы открыть эту дверь";
 
     }
 

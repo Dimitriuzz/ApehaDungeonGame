@@ -41,6 +41,7 @@ public class Player : MonoBehaviour
     [SerializeField] public TMP_Text keysText;
 
     [SerializeField] GameObject fightPanel;
+    [SerializeField] GameObject deathPanel;
 
     private Enemy currentEnemy;
 
@@ -237,10 +238,19 @@ public class Player : MonoBehaviour
             fightPanel.SetActive(false);
             Instantiate(currentEnemy.deathEffect, currentEnemy.transform.position,Quaternion.identity);
             Instantiate(currentEnemy.drop, currentEnemy.transform.position,Quaternion.identity);
+            Debug.Log(currentEnemy.transform.position);
             Destroy(currentEnemy.gameObject);
             inFight = false;
             animator.Play("idle1");
 
+        }
+
+        if (playerCurrentHP==0)
+        {
+            inFight = true;
+            animator.Play("death");
+            fightPanel.SetActive(false);
+            deathPanel.SetActive(true);
         }
 
 

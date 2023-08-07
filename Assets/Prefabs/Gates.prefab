@@ -755,6 +755,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 551b2a18966e4be488df4ee6ca153c17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  needKeys: 0
+  needKeys: 3
   message: {fileID: 0}
   gate: {fileID: 6896941083634228834}
